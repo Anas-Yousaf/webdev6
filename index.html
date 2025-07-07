@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 8: Flexbox and Grid</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+        }
+
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+
+        .slide {
+            display: none;
+            width: 95vw;
+            max-width: 1100px;
+            height: auto;
+            min-height: 80vh;
+            background: rgba(255,255,255,0.85);
+            border-radius: 28px;
+            box-shadow: 0 8px 32px 0 rgba(102,126,234,0.18), 0 1.5px 8px 0 rgba(118,75,162,0.10);
+            padding: 40px 32px;
+            backdrop-filter: blur(8px);
+            animation: slideIn 0.5s cubic-bezier(.4,1.4,.6,1);
+            transition: box-shadow 0.3s, background 0.3s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            font-size: 2.3em;
+            margin-bottom: 28px;
+            text-shadow: 2px 2px 8px rgba(102,126,234,0.08);
+            letter-spacing: 0.02em;
+        }
+
+        h2 {
+            color: #764ba2;
+            font-size: 1.6em;
+            margin-bottom: 18px;
+            border-bottom: 2.5px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            color: #667eea;
+            font-size: 1.2em;
+            margin-bottom: 12px;
+        }
+
+        ul, ol {
+            margin-left: 1.2em;
+        }
+
+        .demo-container {
+            display: flex;
+            gap: 18px;
+            margin: 18px 0;
+            flex-wrap: wrap;
+        }
+
+        .demo-box {
+            background: rgba(240,240,240,0.95);
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 18px;
+            flex: 1 1 220px;
+            min-width: 180px;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.06);
+        }
+
+        .flex-demo {
+            display: flex;
+            gap: 10px;
+            padding: 13px;
+            background: #e8f4f8;
+            border-radius: 8px;
+            margin: 13px 0;
+            transition: background 0.2s;
+        }
+
+        .flex-item {
+            background: #667eea;
+            color: white;
+            padding: 13px 10px;
+            border-radius: 7px;
+            text-align: center;
+            font-weight: bold;
+            min-width: 60px;
+            box-shadow: 0 1px 4px rgba(102,126,234,0.10);
+            transition: background 0.2s, transform 0.2s;
+        }
+        .flex-item:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .grid-demo {
+            display: grid;
+            gap: 10px;
+            padding: 13px;
+            background: #f8e8f4;
+            border-radius: 8px;
+            margin: 13px 0;
+            transition: background 0.2s;
+        }
+
+        .grid-item {
+            background: #764ba2;
+            color: white;
+            padding: 13px 10px;
+            border-radius: 7px;
+            text-align: center;
+            font-weight: bold;
+            min-width: 60px;
+            box-shadow: 0 1px 4px rgba(118,75,162,0.10);
+            transition: background 0.2s, transform 0.2s;
+        }
+        .grid-item:hover {
+            background: #66B2FF;
+            transform: scale(1.05);
+        }
+
+        .three-column {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .portfolio-demo {
+            display: grid;
+            grid-template-areas: 
+                "nav nav nav"
+                "about skills projects"
+                "footer footer footer";
+            gap: 13px;
+            min-height: 260px;
+        }
+
+        .portfolio-demo .nav { grid-area: nav; background: #667eea; }
+        .portfolio-demo .about { grid-area: about; background: #764ba2; }
+        .portfolio-demo .skills { grid-area: skills; background: #66D6A3; }
+        .portfolio-demo .projects { grid-area: projects; background: #f5576c; }
+        .portfolio-demo .footer { grid-area: footer; background: #4facfe; }
+
+        .code-block {
+            background: rgba(45,55,72,0.97);
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 13px 0;
+            box-shadow: 0 1px 6px rgba(45,55,72,0.10);
+        }
+
+        .highlight {
+            background: #ffd700;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #333;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: linear-gradient(90deg, #66B2FF 60%, #66D6A3 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 28px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+            transition: all 0.3s cubic-bezier(.4,1.4,.6,1);
+        }
+
+        .nav-btn:hover, .nav-btn:focus {
+            background: linear-gradient(90deg, #764ba2 60%, #66D6A3 100%);
+            transform: translateY(-2px) scale(1.04);
+            outline: none;
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-number {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: rgba(102, 126, 234, 0.13);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 15px;
+            color: #667eea;
+            font-weight: 600;
+            box-shadow: 0 1px 4px rgba(102,126,234,0.08);
+        }
+
+        .property-demo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 13px;
+            margin: 18px 0;
+        }
+
+        .property-item {
+            background: #f0f8ff;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 13px;
+            min-width: 160px;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(102,126,234,0.06);
+        }
+
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-around { justify-content: space-around; }
+        .align-center { align-items: center; }
+        .align-stretch { align-items: stretch; }
+
+        .responsive-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 13px;
+            margin: 18px 0;
+        }
+
+        .service-item {
+            background: linear-gradient(135deg, #66B2FF, #764ba2);
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s cubic-bezier(.4,1.4,.6,1);
+            box-shadow: 0 1px 6px rgba(102,126,234,0.10);
+        }
+
+        .service-item:hover {
+            transform: translateY(-5px) scale(1.04);
+        }
+
+        /* Responsive Enhancements */
+        @media (max-width: 1024px) {
+            .slide {
+                padding: 24px 8px;
+                min-height: 70vh;
+            }
+            .slide-number {
+                font-size: 14px;
+                top: 10px;
+                right: 10px;
+            }
+        }
+        @media (max-width: 768px) {
+            .slide {
+                padding: 12px 2vw;
+                min-height: 60vh;
+            }
+            h1 { font-size: 1.4em; }
+            h2 { font-size: 1.1em; }
+            .slide-number { font-size: 13px; }
+            .demo-container, .property-demo {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .portfolio-demo {
+                grid-template-areas: 
+                    "nav"
+                    "about"
+                    "skills"
+                    "projects"
+                    "footer";
+                grid-template-columns: 1fr;
+                min-height: 0;
+            }
+            .responsive-demo {
+                grid-template-columns: 1fr;
+            }
+            .navigation {
+                gap: 8px;
+            }
+            .nav-btn {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+        }
+        @media (max-width: 480px) {
+            .slide {
+                padding: 6px 1vw;
+                min-height: 50vh;
+            }
+            h1 { font-size: 1.1em; }
+            .nav-btn {
+                font-size: 15px;
+                padding: 10px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="slide-number">1/12</div>
+            <h1>Lecture 8: Flexbox and Grid</h1>
+            <div style="text-align: center; margin-top: 50px;">
+                <div style="font-size: 1.5em; margin-bottom: 30px; color: #667eea;">
+                    Modern CSS Layout Techniques
+                </div>
+                <div style="display: flex; justify-content: center; gap: 40px; margin-top: 40px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3em; color: #667eea;">📦</div>
+                        <h3>Flexbox</h3>
+                        <p>One-dimensional layouts</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 3em; color: #764ba2;">🎯</div>
+                        <h3>Grid</h3>
+                        <p>Two-dimensional layouts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Learning Objectives -->
+        <div class="slide">
+            <div class="slide-number">2/12</div>
+            <h1>Learning Objectives</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;">
+                <div>
+                    <h3>📚 Teach</h3>
+                    <ul style="font-size: 1.2em; line-height: 2;">
+                        <li>Flexbox properties and concepts</li>
+                        <li>Grid layout fundamentals</li>
+                        <li>When to use each technique</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>🛠️ Practice</h3>
+                    <ul style="font-size: 1.2em; line-height: 2;">
+                        <li>Build 3-column service section</li>
+                        <li>Create responsive layouts</li>
+                        <li>Apply modern CSS techniques</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-top: 40px;">
+                <h3>🎯 Live Project</h3>
+                <p style="font-size: 1.2em; line-height: 1.8;">
+                    Restructure portfolio using <span class="highlight">Flexbox for navigation</span> and 
+                    <span class="highlight">Grid for main sections</span> (about, skills, projects preview)
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 3: What is Flexbox? -->
+        <div class="slide">
+            <div class="slide-number">3/12</div>
+            <h1>What is Flexbox?</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                <div>
+                    <h3>🎯 Purpose</h3>
+                    <p style="font-size: 1.1em; line-height: 1.8;">
+                        Flexbox (Flexible Box Layout) is designed for <strong>one-dimensional layouts</strong> - 
+                        either in a row or column. Perfect for navigation bars, centering content, and distributing space.
+                    </p>
+                    <h3 style="margin-top: 30px;">⚡ Key Benefits</h3>
+                    <ul style="font-size: 1.1em; line-height: 1.8;">
+                        <li>Easy vertical centering</li>
+                        <li>Flexible item sizing</li>
+                        <li>Space distribution</li>
+                        <li>Order control</li>
+                    </ul>
+                    <button class="flexbox-demo-btn" onclick="showFlexboxDemo(this)">Try Flexbox!</button>
+                </div>
+                <div>
+                    <h3>🔧 Basic Setup</h3>
+                    <div class="code-block">
+.container {
+  display: flex;
+  /* Creates flex container */
+}
+
+.item {
+  flex: 1;
+  /* Flexible item */
+}</div>
+                    <div class="flex-demo">
+                        <div class="flex-item">Item 1</div>
+                        <div class="flex-item">Item 2</div>
+                        <div class="flex-item">Item 3</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flexbox-demo-area" style="display:none; margin-top:30px;"></div>
+        </div>
+
+        <!-- Slide 4: Flexbox Properties -->
+        <div class="slide">
+            <div class="slide-number">4/12</div>
+            <h1>Essential Flexbox Properties</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+                <div>
+                    <h3>Container Properties</h3>
+                    <div class="code-block">
+.flex-container {
+  display: flex;
+  flex-direction: row | column;
+  justify-content: center | space-between;
+  align-items: center | stretch;
+  flex-wrap: wrap | nowrap;
+  gap: 20px;
+}</div>
+                </div>
+                <div>
+                    <h3>Item Properties</h3>
+                    <div class="code-block">
+.flex-item {
+  flex: 1; /* grow, shrink, basis */
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+  align-self: center;
+  order: 2;
+}</div>
+                </div>
+            </div>
+            <button class="flexbox-demo-btn" onclick="showFlexboxDemo(this)">Try Flexbox!</button>
+            <div class="flexbox-demo-area" style="display:none; margin-top:30px;"></div>
+            <h3 style="margin-top: 30px;">🎨 Live Examples</h3>
+            <div class="property-demo">
+                <div class="property-item">
+                    <strong>justify-content: center</strong>
+                    <div class="flex-demo justify-center">
+                        <div class="flex-item">A</div>
+                        <div class="flex-item">B</div>
+                    </div>
+                </div>
+                <div class="property-item">
+                    <strong>justify-content: space-between</strong>
+                    <div class="flex-demo justify-between">
+                        <div class="flex-item">A</div>
+                        <div class="flex-item">B</div>
+                    </div>
+                </div>
+                <div class="property-item">
+                    <strong>align-items: center</strong>
+                    <div class="flex-demo align-center" style="height: 80px;">
+                        <div class="flex-item">A</div>
+                        <div class="flex-item">B</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Flexbox Navigation Example -->
+        <div class="slide">
+            <div class="slide-number">5/12</div>
+            <h1>Flexbox Navigation Example</h1>
+            <div style="margin-top: 30px;">
+                <h3>🧭 Perfect for Navigation Bars</h3>
+                <div class="code-block">
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #333;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+}</div>
+                <div style="background: #333; color: white; padding: 15px 30px; border-radius: 10px; margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size: 1.5em; font-weight: bold;">Logo</div>
+                        <div style="display: flex; gap: 30px;">
+                            <a href="#" style="color: white; text-decoration: none;">Home</a>
+                            <a href="#" style="color: white; text-decoration: none;">About</a>
+                            <a href="#" style="color: white; text-decoration: none;">Services</a>
+                            <a href="#" style="color: white; text-decoration: none;">Contact</a>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 1.1em; color: #666; margin-top: 20px;">
+                    Notice how the logo stays on the left and navigation links align to the right, 
+                    with perfect spacing between items.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 6: What is CSS Grid? -->
+        <div class="slide">
+            <div class="slide-number">6/12</div>
+            <h1>What is CSS Grid?</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                <div>
+                    <h3>🎯 Purpose</h3>
+                    <p style="font-size: 1.1em; line-height: 1.8;">
+                        CSS Grid is designed for <strong>two-dimensional layouts</strong> - 
+                        both rows and columns simultaneously. Perfect for complex layouts, 
+                        card grids, and entire page structures.
+                    </p>
+                    <h3 style="margin-top: 30px;">⚡ Key Benefits</h3>
+                    <ul style="font-size: 1.1em; line-height: 1.8;">
+                        <li>Complex layouts made simple</li>
+                        <li>Responsive without media queries</li>
+                        <li>Precise positioning</li>
+                        <li>Overlapping elements</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>🔧 Basic Setup</h3>
+                    <div class="code-block">
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto;
+  gap: 20px;
+}
+
+.grid-item {
+  background: #f0f0f0;
+  padding: 20px;
+}</div>
+                    <div class="grid-demo three-column">
+                        <div class="grid-item">Item 1</div>
+                        <div class="grid-item">Item 2</div>
+                        <div class="grid-item">Item 3</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Grid Properties -->
+        <div class="slide">
+            <div class="slide-number">7/12</div>
+            <h1>Essential Grid Properties</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+                <div>
+                    <h3>Container Properties</h3>
+                    <div class="code-block">
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: 
+    "header header header"
+    "sidebar main main"
+    "footer footer footer";
+  gap: 20px;
+}</div>
+                </div>
+                <div>
+                    <h3>Item Properties</h3>
+                    <div class="code-block">
+.grid-item {
+  grid-column: 1 / 3;
+  grid-row: 2 / 4;
+  grid-area: header;
+  justify-self: center;
+  align-self: start;
+}</div>
+                </div>
+            </div>
+            <h3 style="margin-top: 30px;">🎨 Responsive Grid Example</h3>
+            <div class="code-block">
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}</div>
+            <div class="responsive-demo">
+                <div class="grid-item">Responsive Item 1</div>
+                <div class="grid-item">Responsive Item 2</div>
+                <div class="grid-item">Responsive Item 3</div>
+            </div>
+        </div>
+
+        <!-- Slide 8: 3-Column Service Section -->
+        <div class="slide">
+            <div class="slide-number">8/12</div>
+            <h1>Practice: 3-Column Service Section</h1>
+            <div style="margin-top: 30px;">
+                <h3>🎯 Using CSS Grid</h3>
+                <div class="code-block">
+.services {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.service-item {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.service-item:hover {
+  transform: translateY(-5px);
+}</div>
+                <div class="responsive-demo">
+                    <div class="service-item">
+                        <h3>Web Design</h3>
+                        <p>Creating beautiful, responsive websites</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>Development</h3>
+                        <p>Building robust web applications</p>
+                    </div>
+                    <div class="service-item">
+                        <h3>SEO</h3>
+                        <p>Optimizing for search engines</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Portfolio Layout with Grid Areas -->
+        <div class="slide">
+            <div class="slide-number">9/12</div>
+            <h1>Portfolio Layout: Grid Areas</h1>
+            <div style="margin-top: 20px;">
+                <h3>🏗️ Using Grid Template Areas</h3>
+                <div class="code-block">
+.portfolio {
+  display: grid;
+  grid-template-areas: 
+    "nav nav nav"
+    "about skills projects"
+    "footer footer footer";
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+  min-height: 100vh;
+}
+
+.nav { grid-area: nav; }
+.about { grid-area: about; }
+.skills { grid-area: skills; }
+.projects { grid-area: projects; }
+.footer { grid-area: footer; }</div>
+                <div class="portfolio-demo">
+                    <div class="nav grid-item">Navigation</div>
+                    <div class="about grid-item">About Me</div>
+                    <div class="skills grid-item">My Skills</div>
+                    <div class="projects grid-item">Projects Preview</div>
+                    <div class="footer grid-item">Footer</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Flexbox vs Grid -->
+        <div class="slide">
+            <div class="slide-number">10/12</div>
+            <h1>Flexbox vs Grid: When to Use What?</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                <div style="background: #e8f4f8; padding: 30px; border-radius: 15px;">
+                    <h3 style="color: #667eea;">📦 Use Flexbox For:</h3>
+                    <ul style="font-size: 1.1em; line-height: 2; margin-top: 20px;">
+                        <li>Navigation bars</li>
+                        <li>Centering content</li>
+                        <li>Equal-height columns</li>
+                        <li>Button groups</li>
+                        <li>One-dimensional layouts</li>
+                        <li>Component-level layouts</li>
+                    </ul>
+                    <div style="margin-top: 20px; font-style: italic; color: #666;">
+                        "Content-first approach"
+                    </div>
+                </div>
+                <div style="background: #f8e8f4; padding: 30px; border-radius: 15px;">
+                    <h3 style="color: #764ba2;">🎯 Use Grid For:</h3>
+                    <ul style="font-size: 1.1em; line-height: 2; margin-top: 20px;">
+                        <li>Page layouts</li>
+                        <li>Card grids</li>
+                        <li>Complex positioning</li>
+                        <li>Responsive galleries</li>
+                        <li>Two-dimensional layouts</li>
+                        <li>Layout-level structures</li>
+                    </ul>
+                    <div style="margin-top: 20px; font-style: italic; color: #666;">
+                        "Layout-first approach"
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 30px; padding: 20px; background: #fff8dc; border-radius: 10px;">
+                <strong>💡 Pro Tip:</strong> You can use both together! Grid for the overall layout, Flexbox for components within grid items.
+            </div>
+        </div>
+
+        <!-- Slide 11: Responsive Design -->
+        <div class="slide">
+            <div class="slide-number">11/12</div>
+            <h1>Responsive Design with Grid & Flexbox</h1>
+            <div style="margin-top: 30px;">
+                <h3>📱 Auto-Responsive Grid</h3>
+                <div class="code-block">
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* No media queries needed! */</div>
+                <h3 style="margin-top: 30px;">🔄 Flexible Navigation</h3>
+                <div class="code-block">
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}</div>
+                <div style="background: #f0f8ff; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                    <strong>✨ Key Benefits:</strong>
+                    <ul style="margin-top: 10px; line-height: 1.8;">
+                        <li>Less media queries needed</li>
+                        <li>Content adapts naturally</li>
+                        <li>Better user experience</li>
+                        <li>Easier maintenance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Next Steps -->
+        <div class="slide">
+            <div class="slide-number">12/12</div>
+            <h1>Next Steps & Practice</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                <div>
+                    <h3>🎯 Today's Tasks</h3>
+                    <div style="background: #f0f8ff; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                        <ol style="font-size: 1.1em; line-height: 2;">
+                            <li>Create 3-column service section</li>
+                            <li>Build responsive navigation with Flexbox</li>
+                            <li>Design portfolio layout with Grid</li>
+                            <li>Test on different screen sizes</li>
+                        </ol>
+                    </div>
+                </div>
+                <div>
+                    <h3>📚 Continue Learning</h3>
+                    <div style="background: #fff8dc; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                        <ul style="font-size: 1.1em; line-height: 2;">
+                            <li>CSS Grid Garden (game)</li>
+                            <li>Flexbox Froggy (game)</li>
+                            <li>MDN Web Docs</li>
+                            <li>CSS Tricks guides</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 40px;">
+                <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px; border-radius: 15px;">
+                    <h3 style="color: white; margin-bottom: 15px;">🚀 Remember</h3>
+                    <p style="font-size: 1.2em; line-height: 1.6;">
+                        Modern web layout is about <strong>flexibility</strong> and <strong>responsiveness</strong>. 
+                        Master these tools to create beautiful, adaptive designs!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">❮ Previous</button>
+        <button class="nav-btn" onclick="nextSlide()">Next ❯</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            updateNavigation();
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.querySelector('.navigation .nav-btn:first-child');
+            const nextBtn = document.querySelector('.navigation .nav-btn:last-child');
+            
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') previousSlide();
+            if (e.key === 'ArrowRight') nextSlide();
+        });
+
+        // Initialize
+        updateNavigation();
+
+        // Flexbox Demo Logic
+        function showFlexboxDemo(btn) {
+            const slide = btn.closest('.slide');
+            const demoArea = slide.querySelector('.flexbox-demo-area');
+            if (!demoArea) return;
+            if (demoArea.style.display === 'block') {
+                demoArea.style.display = 'none';
+                btn.textContent = 'Try Flexbox!';
+                return;
+            }
+            // Build controls
+            demoArea.innerHTML = `
+                <div style="background:#f0f8ff;padding:20px;border-radius:10px;max-width:100%;">
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;">
+                        <label>Direction:
+                            <select class="flexbox-control" data-prop="flexDirection">
+                                <option value="row">row</option>
+                                <option value="row-reverse">row-reverse</option>
+                                <option value="column">column</option>
+                                <option value="column-reverse">column-reverse</option>
+                            </select>
+                        </label>
+                        <label>Justify:
+                            <select class="flexbox-control" data-prop="justifyContent">
+                                <option value="flex-start">flex-start</option>
+                                <option value="center">center</option>
+                                <option value="flex-end">flex-end</option>
+                                <option value="space-between">space-between</option>
+                                <option value="space-around">space-around</option>
+                                <option value="space-evenly">space-evenly</option>
+                            </select>
+                        </label>
+                        <label>Align:
+                            <select class="flexbox-control" data-prop="alignItems">
+                                <option value="stretch">stretch</option>
+                                <option value="center">center</option>
+                                <option value="flex-start">flex-start</option>
+                                <option value="flex-end">flex-end</option>
+                                <option value="baseline">baseline</option>
+                            </select>
+                        </label>
+                        <label>Wrap:
+                            <select class="flexbox-control" data-prop="flexWrap">
+                                <option value="nowrap">nowrap</option>
+                                <option value="wrap">wrap</option>
+                                <option value="wrap-reverse">wrap-reverse</option>
+                            </select>
+                        </label>
+                        <label>Gap:
+                            <input type="range" min="0" max="40" value="10" class="flexbox-control" data-prop="gap" style="width:80px;">
+                            <span class="gap-value">10px</span>
+                        </label>
+                    </div>
+                    <div class="flexbox-demo-live" style="margin-top:20px;display:flex;gap:10px;background:#e8f4f8;padding:20px;border-radius:8px;min-height:60px;justify-content:center;align-items:center;flex-wrap:nowrap;">
+                        <div class="flex-item">Item 1</div>
+                        <div class="flex-item">Item 2</div>
+                        <div class="flex-item">Item 3</div>
+                    </div>
+                </div>
+            `;
+            demoArea.style.display = 'block';
+            btn.textContent = 'Hide Flexbox Demo';
+            // Add event listeners
+            const controls = demoArea.querySelectorAll('.flexbox-control');
+            const liveDemo = demoArea.querySelector('.flexbox-demo-live');
+            const gapValue = demoArea.querySelector('.gap-value');
+            function updateDemo() {
+                liveDemo.style.flexDirection = demoArea.querySelector('[data-prop="flexDirection"]').value;
+                liveDemo.style.justifyContent = demoArea.querySelector('[data-prop="justifyContent"]').value;
+                liveDemo.style.alignItems = demoArea.querySelector('[data-prop="alignItems"]').value;
+                liveDemo.style.flexWrap = demoArea.querySelector('[data-prop="flexWrap"]').value;
+                const gap = demoArea.querySelector('[data-prop="gap"]').value;
+                liveDemo.style.gap = gap + 'px';
+                gapValue.textContent = gap + 'px';
+            }
+            controls.forEach(ctrl => {
+                ctrl.addEventListener('input', updateDemo);
+            });
+            updateDemo();
+        }
+    </script>
+</body>
+</html>
